@@ -1,0 +1,20 @@
+{
+  "name": "notification-handler-lambda",
+  "version": "1.0.0",
+  "description": "AWS Lambda that validates, normalizes and stores notification events (MySQL, simulated or real).",
+  "type": "module",
+  "main": "app/handler.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node app/run.js --input sample/events.json --log-level INFO",
+    "test": "node --test \"test/**/*.test.js\"",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down -v"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "mysql2": "^3.24.6"
+  }
+}

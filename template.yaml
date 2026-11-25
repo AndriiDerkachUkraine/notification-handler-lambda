@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Notification handler Lambda fed by an SQS queue, with a dead-letter queue.
+
+Parameters:
+  MySqlUrl:
+    Type: String
+    NoEcho: true
+    Default: ''
+    Description: Empty = simulated store. In production prefer Secrets Manager / RDS Proxy.
+
+Conditions:
+  UseMySql: !Not [!Equals [!Ref MySqlUrl, '']]
+
+Resources:
+  EventsDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600 # 14 days to inspect and replay
+
+  EventsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 180 # >= 6x the function timeout, as AWS recommends
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt EventsDLQ.Arn
+        maxReceiveCount: 5
+
+  NotificationHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs22.x
+      CodeUri: .
+      Handler: app/handler.handler
+      MemorySize: 256
+      Timeout: 30
+      Environment:
+        Variables:
+          NOTIFICATION_STORE: !If [UseMySql, mysql, dummy]
+          MYSQL_URL: !Ref MySqlUrl
+      Events:
+        Queue:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt EventsQueue.Arn
+            BatchSize: 50
+            MaximumBatchingWindowInSeconds: 5
+            # Only messages listed in batchItemFailures are retried.
+            FunctionResponseTypes: [ReportBatchItemFailures]
+
+Outputs:
+  QueueUrl:
+    Value: !Ref EventsQueue

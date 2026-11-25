@@ -1,0 +1,44 @@
+[
+  {
+    "type": "user_registered",
+    "name": "  Frank O'Neil ",
+    "email": "Frank.ONeil@Example.COM",
+    "roles": ["Admin", "admin", "  Editor"],
+    "joined": 1617235200,
+    "plan": "pro",
+    "event_id": 42
+  },
+  {
+    "type": "user_registered",
+    "name": "  Frank O'Neil ",
+    "email": "Frank.ONeil@Example.COM",
+    "roles": ["Admin", "admin", "  Editor"],
+    "joined": 1617235200,
+    "plan": "pro",
+    "event_id": 42
+  },
+  {
+    "type": "password_reset",
+    "email": "grace@example.com",
+    "requested": "Monday, June 7, 2021 9:15 AM EDT"
+  },
+  {
+    "type": "password_reset",
+    "email": "grace@example.com",
+    "requested": "Monday, June 7, 2021 9:15 AM EDT"
+  },
+  {
+    "type": " user_deleted ",
+    "email": "heidi@example.com",
+    "deleted": "15th July 2021 18:30 CEST"
+  },
+  { "type": "user_deleted", "email": "ivan@example.com" },
+  { "type": "user_registered", "name": "Judy", "email": "judy@example.com", "roles": "viewer", "joined": "2021-02-30" },
+  { "type": "user_registered", "name": "Mallory", "email": "mallory@example.com", "roles": [1, 2], "joined": "2021-05-05" },
+  { "type": "user_registered", "email": "not-an-email", "roles": "viewer", "joined": "2021-05-05" },
+  { "type": "password_reset", "email": "oscar@example.com", "requested": "2021-06-01 10:00", "event_id": true },
+  { "email": "peggy@example.com" },
+  "just a string",
+  null,
+  []
+]
