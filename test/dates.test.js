@@ -15,6 +15,9 @@ describe('toIsoDate', () => {
     ['2021-04-01T10:00+0530', '2021-04-01T04:30:00.000Z'],
     ['2021.4.1 8:05', '2021-04-01T08:05:00.000Z'],
     ['Monday, June 7, 2021 9:15 AM EDT', '2021-06-07T13:15:00.000Z'],
+    ['Mon, June 7, 2021', '2021-06-07T00:00:00.000Z'],
+    // The weekday matches the local date, even though in UTC it is already Tuesday
+    ['Monday, June 7, 2021 11:30 PM PDT', '2021-06-08T06:30:00.000Z'],
     ['Apr 5 2021 12:00 am', '2021-04-05T00:00:00.000Z'],
     ['Sept 3, 2021', '2021-09-03T00:00:00.000Z'],
     ['15th July 2021 18:30 CEST', '2021-07-15T16:30:00.000Z'],
@@ -27,7 +30,7 @@ describe('toIsoDate', () => {
   }
 
   const invalid = ['yesterday', '2021-02-30', '2023-02-29', 'April 31st, 2021', '2021-04-01 25:00', '2021-04-01 13:45 PM',
-    '2021-04-01 10:00 XYZ', 'Smarch 5, 2021', '04/01/2021', '', '   ', null, undefined, {}, -5, NaN];
+    '2021-04-01 10:00 XYZ', 'Smarch 5, 2021', '04/01/2021', 'Tuesday, June 7, 2021', 'Foo, June 7, 2021', '', '   ', null, undefined, {}, -5, NaN];
   for (const input of invalid) {
     it(`rejects ${JSON.stringify(input) ?? String(input)}`, () => assert.equal(toIsoDate(input), null));
   }

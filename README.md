@@ -151,7 +151,7 @@ Field parsers live in [`app/domain/fields.js`](app/domain/fields.js) (`requiredS
 | Day first | `15th July 2021 18:30 CEST` |
 | Unix timestamp (s or ms) | `1617235200`, `"1617235200000"` |
 
-Rejected rather than guessed: relative dates (`yesterday`), impossible dates (`2021-02-30`, `April 31st`), `25:00`, `13:45 PM`, unknown zones, and ambiguous numeric forms such as `04/01/2021` (April 1 or January 4?). A value without a zone is treated as UTC. Zone abbreviations are limited to an explicit, unambiguous list (UTC/GMT, US zones, CET/CEST, EET/EEST).
+Rejected rather than guessed: relative dates (`yesterday`), impossible dates (`2021-02-30`, `April 31st`), `25:00`, `13:45 PM`, a weekday that does not match the date (`Tuesday, June 7, 2021`), unknown zones, and ambiguous numeric forms such as `04/01/2021` (April 1 or January 4?). A value without a zone is treated as UTC. Zone abbreviations are limited to an explicit, unambiguous list (UTC/GMT, US zones, CET/CEST, EET/EEST).
 
 ---
 
@@ -260,7 +260,7 @@ Events in a batch are processed **sequentially, in input order**. That is what m
 ## Tests
 
 ```bash
-npm test                                         # 84 tests, no database needed
+npm test                                         # 88 tests, no database needed
 MYSQL_URL=mysql://app:app@127.0.0.1:3307/notifications npm test   # + 2 integration tests on real MySQL
 ```
 

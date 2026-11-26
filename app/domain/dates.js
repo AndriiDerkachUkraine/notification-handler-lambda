@@ -4,6 +4,7 @@
  */
 
 const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+const WEEKDAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
 // Only unambiguous, widely used abbreviations; minutes east of UTC.
 const ZONES = {
@@ -17,13 +18,18 @@ const ZONE = String.raw`\s*(Z|[+-]\d{2}(?::?\d{2})?|[A-Za-z]{2,5})?`;
 
 const NUMERIC = new RegExp(String.raw`^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})${TIME}${ZONE}$`);
 // "April 5th, 2021 13:45 PST", optionally with a weekday: "Monday, April 5, 2021"
-const MONTH_FIRST = new RegExp(String.raw`^(?:[A-Za-z]+,?\s+)?([A-Za-z]{3,9})\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})${TIME}${ZONE}$`);
+const MONTH_FIRST = new RegExp(String.raw`^(?:([A-Za-z]+),?\s+)?([A-Za-z]{3,9})\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})${TIME}${ZONE}$`);
 // "5th April 2021 10:00 CET"
 const DAY_FIRST = new RegExp(String.raw`^(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})${TIME}${ZONE}$`);
 
-function month(name) {
+/** Full name or an abbreviation of 3+ letters ("Sept", "Mon") → index in `names`, or -1. */
+function nameIndex(names, name) {
   const lower = name.toLowerCase();
-  const index = MONTHS.findIndex((m) => m.startsWith(lower) && lower.length >= 3);
+  return lower.length < 3 ? -1 : names.findIndex((n) => n.startsWith(lower));
+}
+
+function month(name) {
+  const index = nameIndex(MONTHS, name);
   return index === -1 ? null : index + 1;
 }
 
@@ -69,7 +75,14 @@ export function toIsoDate(value) {
   let m;
   let date = null;
   if ((m = text.match(NUMERIC))) date = build(m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9]);
-  else if ((m = text.match(MONTH_FIRST))) date = build(m[3], month(m[1]), m[2], m[4], m[5], m[6], m[7], m[8], m[9]);
+  else if ((m = text.match(MONTH_FIRST))) {
+    const [, weekday, monthName, day, year, ...time] = m;
+    date = build(year, month(monthName), day, ...time);
+    // "Tuesday, June 7, 2021" contradicts itself (June 7 was a Monday): rejected, not guessed.
+    if (date && weekday && nameIndex(WEEKDAYS, weekday) !== new Date(Date.UTC(Number(year), month(monthName) - 1, Number(day))).getUTCDay()) {
+      date = null;
+    }
+  }
   else if ((m = text.match(DAY_FIRST))) date = build(m[3], month(m[2]), m[1], m[4], m[5], m[6], m[7], m[8], m[9]);
   return date && !Number.isNaN(date.getTime()) ? date.toISOString() : null;
 }
