@@ -285,7 +285,6 @@ For production MySQL, put the credentials in Secrets Manager and connect through
 ## Design decisions and limitations
 
 - **Zone-less timestamps are UTC.** If producers send local times, the zone must be agreed per producer; guessing would silently shift data.
-- **The weekday in "Monday, June 7, 2021" is accepted but not cross-checked** against the date.
 - **Email validation is syntactic.** Whether an address exists is not this function's job.
 - **`ProcessedEvent` is an addition** to the given schema. The `Notification` table has no unique column suitable for idempotency, and adding a separate table leaves the given one untouched.
 - **The simulated store's deduplication lives in memory,** so it covers one warm container. Cross-container idempotency needs the real database (or e.g. a DynamoDB conditional write).
